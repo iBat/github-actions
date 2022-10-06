@@ -1,4 +1,5 @@
 name: Get LGTM alerts
+description: Get LGTM alerts
 
 runs:
   using: "composite"

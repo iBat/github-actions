@@ -1,4 +1,5 @@
 name: "Notify Teams"
+description: Send Teams notifications
 
 inputs:
   hook_url:

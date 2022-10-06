@@ -1,0 +1,35 @@
+{
+  "name": "github-actions",
+  "description": "DevExpress GitHub actions",
+  "private": true,
+  "version": "0.1.0",
+  "author": "Developer Express Inc.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "homepage": "https://github.com/DevExpress/github-actions#readme",
+  "bugs": {
+    "url": "https://github.com/DevExpress/github-actions/issues"
+  },
+  "scripts": {
+    "clean": "npm run clean --workspaces",
+    "build": "npm run build --workspaces",
+    "package": "npm run package --workspaces"
+  },
+  "pre-commit": [
+    "clean",
+    "build",
+    "package"
+  ],
+  "devDependencies": {
+    "@types/node": "^16.11.7",
+    "@types/semver": "^7.3.12",
+    "@vercel/ncc": "^0.34.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.8.4"
+  },
+  "workspaces": [
+    "verify-version-changed"
+  ]
+}
