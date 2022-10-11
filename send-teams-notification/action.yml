@@ -8,6 +8,11 @@ inputs:
   bearer_token:
     description: "Github token"
     required: false
+  only_on_push:
+    description: "Enable on push event only"
+    default: 'true'
+    required: false
+
 
 runs:
   using: "composite"
@@ -15,7 +20,7 @@ runs:
     - name: execute
       shell: bash
       run: |
-        if [ "${{ github.event_name }}" != "push" ]; then exit 0; fi
+        if [ "${{ inputs.only_on_push }}" == "true" ] && [ "${{ github.event_name }}" != "push" ]; then exit 0; fi
         RUN_INFO=$(curl --silent https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }})
         COMMIT_MSG=$(echo $RUN_INFO | jq -r .head_commit.message)
         COMMIT_AUTHOR=$(echo $RUN_INFO | jq -r .head_commit.author.name)
