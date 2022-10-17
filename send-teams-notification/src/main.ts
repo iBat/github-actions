@@ -85,7 +85,7 @@ async function notifyCodeQlAlerts(alerts: Array<any>, webhook: IncomingWebhook) 
                                 },
                                 {
                                     'name': 'Found In (or earlier):',
-                                    'value': `[${{ sha }}](https://github.com/iBat/codeql-test/commit/${{ sha }})`
+                                    'value': `[${alert.most_recent_instance.commit_sha}](https://github.com/iBat/codeql-test/commit/${alert.most_recent_instance.commit_sha})`
                                 },
                             ]
                         }
