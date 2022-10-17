@@ -1,3 +1,4 @@
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -151,7 +152,7 @@ function notifyFailedWorkflow(runInfo, webhook) {
                         },
                         {
                             'name': 'Commit',
-                            'value': `[runInfo.head_commit.message](https://github.com/${repo.owner}/${repo.repo}/commit/${runInfo.head_commit.id})`
+                            'value': `[${runInfo.head_commit.message}](https://github.com/${repo.owner}/${repo.repo}/commit/${runInfo.head_commit.id})`
                         }
                     ]
                 }
