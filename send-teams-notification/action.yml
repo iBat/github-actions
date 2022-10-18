@@ -12,8 +12,18 @@ inputs:
     description: 'Enable on push event only'
     default: 'true'
     required: false
+  specific_repo:
+    description: 'Filter by repository name (format: `organization/repository`)'
+    required: false
+  specific_branch:
+    description: 'Filter by branch name'
+    required: false
   alerts:
     description: 'Alerts JSON array'
+    required: false
+  alerts_cache_file:
+    description: 'Alerts cache file name'
+    default: 'notify.json'
     required: false
 
 runs:

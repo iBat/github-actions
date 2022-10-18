@@ -39,22 +39,29 @@ const core = __importStar(require("@actions/core"));
 const fs_1 = __importDefault(require("fs"));
 const github_1 = require("@actions/github");
 const ms_teams_webhook_1 = require("ms-teams-webhook");
-const ARTIFACT = 'notify.json';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const hook = core.getInput('hook_url', { required: true });
-            const ghToken = core.getInput('bearer_token', { required: false });
             const alertsRaw = core.getInput('alerts', { required: false });
             const alerts = alertsRaw && JSON.parse(alertsRaw);
-            const onlyOnPush = core.getInput('only_on_push', { required: false }) === 'true';
             const webhook = new ms_teams_webhook_1.IncomingWebhook(hook);
             if (alerts) {
                 yield notifyCodeQlAlerts(alerts, webhook);
             }
             else {
-                const { eventName, repo, runId } = github_1.context;
+                const ghToken = core.getInput('bearer_token', { required: false });
+                const onlyOnPush = core.getInput('only_on_push', { required: false }) === 'true';
+                const specificRepo = core.getInput('specific_repo', { required: false });
+                const specificBranch = core.getInput('specific_branch', { required: false });
+                const { eventName, repo, ref, runId } = github_1.context;
                 if (onlyOnPush && eventName !== 'push') {
+                    return;
+                }
+                if (specificRepo && specificRepo !== `${repo.owner}/${repo.repo}`) {
+                    return;
+                }
+                if (specificBranch && specificBranch !== ref) {
                     return;
                 }
                 const octokit = (0, github_1.getOctokit)(ghToken);
@@ -74,11 +81,11 @@ function run() {
 }
 function notifyCodeQlAlerts(alerts, webhook) {
     return __awaiter(this, void 0, void 0, function* () {
+        const alertsCacheFile = core.getInput('alerts_cache_file', { required: false });
         let notify_cache = {};
-        if (fs_1.default.existsSync(ARTIFACT)) {
-            notify_cache = JSON.parse(fs_1.default.readFileSync(ARTIFACT).toString());
+        if (fs_1.default.existsSync(alertsCacheFile)) {
+            notify_cache = JSON.parse(fs_1.default.readFileSync(alertsCacheFile).toString());
         }
-        const { sha } = github_1.context;
         for (let alert of alerts) {
             if (alert.state === 'open') {
                 if (!notify_cache[alert.number]) {
@@ -125,7 +132,7 @@ function notifyCodeQlAlerts(alerts, webhook) {
                 }
             }
         }
-        fs_1.default.writeFileSync(ARTIFACT, JSON.stringify(notify_cache));
+        fs_1.default.writeFileSync(alertsCacheFile, JSON.stringify(notify_cache));
     });
 }
 function notifyFailedWorkflow(runInfo, webhook) {

@@ -3,24 +3,31 @@ import fs from 'fs';
 import { context, getOctokit } from '@actions/github'
 import { IncomingWebhook } from 'ms-teams-webhook';
 
-const ARTIFACT = 'notify.json';
 type GithubContext = typeof context;
 
 async function run(): Promise<void> {
     try {
         const hook = core.getInput('hook_url', { required: true });
-        const ghToken = core.getInput('bearer_token', { required: false });
         const alertsRaw = core.getInput('alerts', { required: false });
         const alerts = alertsRaw && JSON.parse(alertsRaw);
-        const onlyOnPush = core.getInput('only_on_push', { required: false }) === 'true';
 
         const webhook = new IncomingWebhook(hook);
         if (alerts) {
             await notifyCodeQlAlerts(alerts, webhook);
         } else {
-            const { eventName, repo, runId }: GithubContext = context;
+            const ghToken = core.getInput('bearer_token', { required: false });
+            const onlyOnPush = core.getInput('only_on_push', { required: false }) === 'true';
+            const specificRepo = core.getInput('specific_repo', { required: false });
+            const specificBranch = core.getInput('specific_branch', { required: false });
+            const { eventName, repo, ref, runId }: GithubContext = context;
 
             if (onlyOnPush && eventName !== 'push') {
+                return;
+            }
+            if (specificRepo && specificRepo !== `${repo.owner}/${repo.repo}`) {
+                return;
+            }
+            if (specificBranch && specificBranch !== ref) {
                 return;
             }
 
@@ -40,13 +47,12 @@ async function run(): Promise<void> {
 }
 
 async function notifyCodeQlAlerts(alerts: Array<any>, webhook: IncomingWebhook) {
+    const alertsCacheFile = core.getInput('alerts_cache_file', { required: false });
     let notify_cache: { [key: string]: Object } = {};
 
-    if (fs.existsSync(ARTIFACT)) {
-        notify_cache = JSON.parse(fs.readFileSync(ARTIFACT).toString());
+    if (fs.existsSync(alertsCacheFile)) {
+        notify_cache = JSON.parse(fs.readFileSync(alertsCacheFile).toString());
     }
-
-    const { sha }: GithubContext = context;
 
     for (let alert of alerts) {
         if (alert.state === 'open') {
@@ -95,7 +101,7 @@ async function notifyCodeQlAlerts(alerts: Array<any>, webhook: IncomingWebhook) 
         }
     }
 
-    fs.writeFileSync(ARTIFACT, JSON.stringify(notify_cache));
+    fs.writeFileSync(alertsCacheFile, JSON.stringify(notify_cache));
 }
 
 async function notifyFailedWorkflow(runInfo: any, webhook: IncomingWebhook) {
