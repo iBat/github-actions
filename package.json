@@ -30,7 +30,7 @@
     "typescript": "^4.8.4"
   },
   "workspaces": [
-    "verify-version-changed",
-    "send-teams-notification"
+    "send-teams-notification",
+    "verify-version-change"
   ]
 }

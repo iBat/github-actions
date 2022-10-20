@@ -1,5 +1,5 @@
-name: verify-version-changed
-description: Verify changed package version
+name: verify-version-change
+description: Verify change package version
 
 inputs:
   path:

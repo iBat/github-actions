@@ -1,9 +1,9 @@
-name: generator-version-guard
-description: Guard - Update version generator if source files have changed
+name: check-for-version-update
+description: Guard - Update version if source files have changed
 
 inputs:
-  generator_path:
-    description: path to generator folder
+  path:
+    description: path to source folder
     required: true
 
 runs:
@@ -15,16 +15,16 @@ runs:
 
     - name: Check if version has been updated
       id: check
-      uses: DevExpress/github-actions/verify-version-changed@main
+      uses: DevExpress/github-actions/verify-version-change@main
       with:
-        path: ${{ inputs.generator_path }}
+        path: ${{ inputs.path }}
 
     - name: Check changes
       shell: bash
       env:
-        source-path: ${{ inputs.generator_path }}/src/
+        source-path: ${{ inputs.path }}/src/
       if: ${{ contains(steps.changed-source.outputs.all_changed_files, env.source-path) &&
         steps.check.outputs.changed == 'false' }}
       run: |
-        echo "Please, update version in ${{ inputs.generator_path }}/package.json"
+        echo "Please, update version in ${{ inputs.path }}/package.json"
         exit 1
