@@ -30,6 +30,6 @@
     "typescript": "^4.8.4"
   },
   "workspaces": [
-    "verify-version-changed"
+    "verify-version-change"
   ]
 }
