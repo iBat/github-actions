@@ -1,70 +1,31 @@
-name: "Notify Teams"
+name: Notify Teams
 description: Send Teams notifications
 
 inputs:
   hook_url:
-    description: "URL of MS Teams hook"
+    description: 'URL of MS Teams hook'
     required: true
   bearer_token:
-    description: "Github token"
+    description: 'Github token'
     required: false
   only_on_push:
-    description: "Enable on push event only"
+    description: 'Enable on push event only'
     default: 'true'
     required: false
-
+  specific_repo:
+    description: 'Filter by repository name (format: `organization/repository`)'
+    required: false
+  specific_branch:
+    description: 'Filter by branch name'
+    required: false
+  alerts:
+    description: 'Alerts JSON array'
+    required: false
+  alerts_cache_file:
+    description: 'Alerts cache file name'
+    default: 'notify.json'
+    required: false
 
 runs:
-  using: "composite"
-  steps:
-    - name: execute
-      shell: bash
-      run: |
-        if [ "${{ inputs.only_on_push }}" == "true" ] && [ "${{ github.event_name }}" != "push" ]; then exit 0; fi
-        RUN_INFO=$(curl --silent https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }})
-        COMMIT_MSG=$(echo $RUN_INFO | jq -r .head_commit.message)
-        COMMIT_AUTHOR=$(echo $RUN_INFO | jq -r .head_commit.author.name)
-        WEBPAGE_URL=$(echo $RUN_INFO | jq -r .html_url)
-        curl --silent -X POST \
-        --url ${{ inputs.hook_url }} \
-        --header 'authorization: Bearer ${{ inputs.bearer_token }}' \
-        --header "Content-Type: application/json; charset=utf-8" \
-        --data '{
-        "@context": "https://schema.org/extensions",
-        "@type": "MessageCard",
-        "text": "Run failed",
-        "sections": [
-            {
-                "facts": [
-                    {
-                        "name": "Repository",
-                        "value": "${{ github.repository }}"
-                    },
-                    {
-                        "name": "Workflow",
-                        "value": "${{ github.workflow }}"
-                    },
-                    {
-                        "name": "Committer",
-                        "value": "'"$COMMIT_AUTHOR"'"
-                    },
-                    {
-                        "name": "Commit",
-                        "value": "'"$COMMIT_MSG"'"
-                    }
-                ]
-            }
-        ],
-        "potentialAction": [
-            {
-                "@type": "OpenUri",
-                "name": "View in GitHub",
-                "targets": [
-                    {
-                        "os": "default",
-                        "uri": "'"$WEBPAGE_URL"'"
-                    }
-                ]
-            }
-        ]
-        }'
+  using: node16
+  main: dist/main.js

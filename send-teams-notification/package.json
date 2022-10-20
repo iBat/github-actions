@@ -1,0 +1,28 @@
+{
+  "name": "send-teams-notification",
+  "description": "Send notification to MS Teams",
+  "version": "0.1.0",
+  "author": "Developer Express Inc.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "main": "src/main.ts",
+  "scripts": {
+    "clean": "rimraf dist lib",
+    "build": "tsc",
+    "package": "ncc build"
+  },
+  "dependencies": {
+    "@actions/core": "^1.9.1",
+    "@actions/github": "^5.1.0",
+    "ms-teams-webhook": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7",
+    "@types/semver": "^7.3.12",
+    "@vercel/ncc": "^0.34.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.8.4"
+  }
+}
