@@ -7,7 +7,7 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "main": "src/main.ts",
+  "main": "lib/main.js",
   "scripts": {
     "clean": "rimraf dist lib",
     "build": "tsc",
